@@ -137,9 +137,7 @@ pip install django cryptography pillow python-dotenv requests
 
 ---
 
-## 📄 License
 
-This project is licensed under the **MIT License**.
 
 ---
 
