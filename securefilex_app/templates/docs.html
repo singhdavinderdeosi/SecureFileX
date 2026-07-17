@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Docs | SecureFileX{% endblock %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+<div class="container py-5 text-light">
+  <header class="text-center mb-5" data-aos="fade-down">
+    <h1 class="display-5 fw-bold text-info text">📄 SecureFileX Documentation</h1>
+    <p class="lead text-white-50">Complete guide to features, architecture, and setup.</p>
+  </header>
+
+  <!-- Documentation Cards -->
+  <div class="glass-docs p-4 rounded-4 shadow-lg">
+    {% comment %} Section 1: Introduction {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up">
+      <h2 class="text-info">🔐 Introduction</h2>
+      <p class="text-white-50">
+        <strong>SecureFileX</strong> is a modern, file security platform using Django. It provides tools for file encryption, QR/PIN-based sharing, and steganography, packaged in a simple and elegant UI for everyone.
+      </p>
+    </section>
+
+    {% comment %} Section 2: Features {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="100">
+      <h2 class="text-info">🚀 Features</h2>
+      <ul class="text-white-50">
+        <li>🔒 Secure file encryption with Fernet, ChaCha20, AES-GCM, RSA</li>
+        <li>🖼️ Steganography support to hide/reveal text in images</li>
+        <li>🔑 Auto-generated secure key or passphrase support</li>
+        <li>📄 Metadata stored in JSON format for integrity</li>
+        <li>📦 PIN & QR-based file sharing system</li>
+        <li>💬 AI-annotated logs and secure download links</li>
+        <li>🎨 Responsive animated interface with drag-and-drop</li>
+      </ul>
+    </section>
+
+    {% comment %} Section 3: Installation {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="200">
+      <h2 class="text-info">⚙️ Installation</h2>
+      <pre class="bg-dark text-light p-3 rounded border border-info">
+git clone https://github.com/singhdavinderdeosi/SecureFileX.git
+cd SecureFileX
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+      </pre>
+    </section>
+
+    {% comment %} Section 4: Usage {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="300">
+      <h2 class="text-info">🧪 Usage</h2>
+      <ul class="text-white-50">
+        <li>🔐 Encrypt files by selecting an algorithm and uploading your file.</li>
+        <li>🔓 Decrypt by providing the key, scanning QR, or uploading a `.keys` file.</li>
+        <li>🖼️ Hide secret messages in images or extract them with steganography.</li>
+      </ul>
+    </section>
+
+    {% comment %} Section 5: Algorithms {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="400">
+      <h2 class="text-info">🛡️ Encryption Algorithms</h2>
+      <table class="table table-dark table-bordered table-hover rounded mt-3 border border-info">
+        <thead class="table-info text-dark">
+          <tr>
+            <th>Algorithm</th>
+            <th>Type</th>
+            <th>Key/Nonce Details</th>
+            <th>Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fernet</td>
+            <td>Symmetric</td>
+            <td>Key only (base64)</td>
+            <td>Simple, secure file encryption</td>
+          </tr>
+          <tr>
+            <td>ChaCha20</td>
+            <td>Symmetric</td>
+            <td>Key + Nonce</td>
+            <td>High-speed stream cipher</td>
+          </tr>
+          <tr>
+            <td>AES-GCM</td>
+            <td>Symmetric</td>
+            <td>Key + Nonce + Tag</td>
+            <td>Authenticated block encryption</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    {% comment %} Section 6: Metadata Format {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="500">
+      <h2 class="text-info">📄 Metadata Format</h2>
+      <p class="text-white-50">Every encrypted file includes metadata in `.json` format:</p>
+      <pre class="bg-dark text-light p-3 rounded border border-secondary">
+{
+  "algorithm": "AES-GCM",
+  "key": "base64-encoded-key",
+  "nonce": "base64-encoded-nonce",
+  "tag": "base64-encoded-tag"
+}
+      </pre>
+    </section>
+
+    {% comment %} Section 7: Tech Stack {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="600">
+      <h2 class="text-info">🛠️ Tech Stack</h2>
+      <ul class="text-white-50">
+        <li>💻 Backend: Django (Python)</li>
+        <li>🔐 Crypto: cryptography, PyCryptodome</li>
+        <li>🎨 Frontend: Bootstrap 5, AOS.js, Animate.css</li>
+        <li>🖼️ Image Handling: Pillow</li>
+        <li>🧪 Steganography: LSB pixel manipulation</li>
+      </ul>
+    </section>
+
+    {% comment %} Section 8: Structure {% endcomment %}
+    <section class="glass-section mb-5" data-aos="fade-up" data-aos-delay="700">
+      <h2 class="text-info">📁 Project Structure</h2>
+      <pre class="bg-dark text-light p-3 rounded border border-secondary">
+SecureFileX/
+├── core/           # Encryption logic
+├── stego/          # Steganography logic
+├── templates/      # HTML pages
+├── static/         # CSS, JS, images
+├── media/          # Uploaded files
+├── manage.py
+└── requirements.txt
+      </pre>
+    </section>
+
+    <!-- Back Button -->
+    <div class="text-center mt-5" data-aos="zoom-in">
+      <a href="{% url 'home' %}" class="btn btn-outline-info btn-lg px-5 shadow-lg glow">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- AOS Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>AOS.init({ duration: 900, once: true });</script>
+
+<style>
+  .glass-docs {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+  }
+
+  .glass-section {
+    padding: 25px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 8px 20px rgba(0, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .glass-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 255, 255, 0.1);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 8px #0ff, 0 0 16px #0ff;
+  }
+
+  .glow {
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CyberChef | SecureFileX{% endblock %}
+
+{% block content %}
+<div class="container text-center my-4">
+  <h1 class="display-5 text-info mb-4 animate__animated animate__fadeInDown">🔧 SecureX</h1>
+  <p class="lead text-light mb-4">Analyze, encode, decode, and transform data with CyberChef — locally integrated for speed and privacy.</p>
+  
+  <div class="ratio ratio-16x9 border border-info rounded shadow">
+    <iframe 
+      src="{% static 'cyberchef/CyberChef.html' %}" 
+      width="100%" 
+      height="100%" 
+      style="border: none; border-radius: 10px;">
+    </iframe>
+  </div>
+
+  <p class="mt-4 text small">CyberChef by <a href="https://github.com/gchq/CyberChef" target="_blank" class="text-info">GCHQ</a> | Running fully in your browser via local static files.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About | SecureFileX{% endblock %}
+
+{% block content %}
+<!-- External Styles -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
+<!-- 🔢 Binary Rain Canvas -->
+<canvas id="binary-rain"></canvas>
+
+<div class="container py-5 position-relative" style="z-index: 2;">
+
+  <!-- 🔍 Header -->
+  <header class="text-center mb-5" data-aos="fade-down">
+    <h1 class="display-5 fw-bold text-glow reveal-text animate__animated animate__fadeInDown">🔍 About SecureFileX</h1>
+    <p class="lead text-white-50 reveal-text animate__animated animate__fadeInUp">
+      Quantum-ready encryption meets AI-powered secure file intelligence.
+    </p>
+  </header>
+
+  <!-- 📘 Project Overview -->
+  <section class="row justify-content-center mb-5" data-aos="fade-up">
+    <div class="col-lg-10">
+      <div class="card glass-card text-light border border-info shadow-lg p-4 rounded-3 animate__animated animate__fadeInUp">
+        <h2 class="text-info mb-3">📘 Project Overview</h2>
+        <p class="text-white-50">
+          <strong>SecureFileX</strong> integrates advanced cryptography with AI capabilities for enhanced security and usability.
+        </p>
+        <p class="text-white-50">
+          It features intuitive encryption, file sharing, and modular design built for the AI-powered future.
+        </p>
+        <a href="{% url 'project_overview' %}" class="btn btn-outline-info btn-lg mt-3">
+          View Project Overview
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🚀 Feature Link Cards -->
+  <section class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+    <div class="col" data-aos="fade-up" data-aos-delay="0">
+      <a href="{% url 'build_steps' %}" class="text-decoration-none">
+        <div class="card glass-card neon-border-danger shadow-lg rounded-3 glow">
+          <div class="card-body text-center">
+            <span style="font-size: 50px;">🔨</span>
+            <h4 class="text-danger">Build Steps</h4>
+            <p class="small">From crypto core to UI and deployment</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col" data-aos="fade-up" data-aos-delay="100">
+      <a href="{% url 'poster' %}" class="text-decoration-none">
+        <div class="card glass-card neon-border-secondary shadow-lg rounded-3 glow">
+          <div class="card-body text-center">
+            <span style="font-size: 50px;">🖼️</span>
+            <h4 class="text-secondary">Project Poster</h4>
+            <p class="small">View the interactive project poster</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col" data-aos="fade-up" data-aos-delay="200">
+      <a href="{% url 'presentation' %}" class="text-decoration-none">
+        <div class="card glass-card neon-border-info shadow-lg rounded-3 glow">
+          <div class="card-body text-center">
+            <span style="font-size: 50px;">📽️</span>
+            <h4 class="text-info">Presentation</h4>
+            <p class="small">Explore the project presentation slideshow</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 🔙 Back Button -->
+  <div class="text-center mt-5" data-aos="zoom-in">
+    <a href="{% url 'home' %}" class="btn btn-outline-info btn-lg px-5 glow">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+</div>
+
+<!-- 🎨 Styles -->
+<style>
+  #binary-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: black;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  .glass-card {
+    backdrop-filter: blur(12px);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-body {
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    transform-style: preserve-3d;
+  }
+
+  .card-body:hover {
+    transform: rotateY(10deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .glow:hover {
+    box-shadow: 0 0 20px #00f0ff;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+  }
+
+  .neon-border-warning { border: 1px solid rgba(255,255,0,0.3); }
+  .neon-border-success { border: 1px solid rgba(0,255,100,0.3); }
+  .neon-border-primary { border: 1px solid rgba(0,128,255,0.3); }
+  .neon-border-info    { border: 1px solid rgba(0,255,255,0.3); }
+  .neon-border-danger  { border: 1px solid rgba(255,0,0,0.3); }
+  .neon-border-light   { border: 1px solid rgba(255,255,255,0.2); }
+  .neon-border-secondary { border: 1px solid rgba(255, 0, 255, 0.3); }
+
+  .reveal-text {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1s ease;
+  }
+
+  .reveal-visible {
+    opacity: 1 !important;
+    transform: translateY(0px) !important;
+  }
+</style>
+
+<!-- 🔧 Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({ duration: 900, once: true });
+
+  const reveals = document.querySelectorAll(".reveal-text");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("reveal-visible");
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+<!-- 💻 Binary Rain Canvas Script -->
+<script>
+  const canvas = document.getElementById("binary-rain");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const binary = "01";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = Array(Math.floor(columns)).fill(1);
+
+  function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#00ffff";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = binary[Math.floor(Math.random() * binary.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height || Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(draw, 33);
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+{% endblock %}

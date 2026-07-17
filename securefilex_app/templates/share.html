@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Secure File Sharing | SecureFileX{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+<style>
+  body {
+    background: #0a0f1a;
+  }
+
+  .share-container {
+    background: linear-gradient(to bottom, #0e1625, #111d2f);
+    padding: 2.5rem 2rem;
+    max-width: 800px;
+    margin: 3rem auto;
+    border-radius: 14px;
+    box-shadow: 0 0 30px rgba(0, 255, 225, 0.15);
+    color: #dcdcdc;
+    text-align: center;
+  }
+
+  .share-container h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #00ffe1;
+  }
+
+  .form-label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #00ffcc;
+    text-align: left;
+    display: block;
+    margin-bottom: 0.6rem;
+  }
+
+  .file-upload {
+    background: #1c1f25;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px dashed #00ffe1;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .file-upload:hover {
+    border-color: #00ffae;
+  }
+
+  .file-upload input[type="file"] {
+    background: none;
+    border: none;
+    color: #00ffe1;
+    font-weight: 500;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .btn-share {
+    background: linear-gradient(to right, #00ffe1, #00ffae);
+    color: #000;
+    font-weight: bold;
+    padding: 0.9rem 2.5rem;
+    border-radius: 50px;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-share:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 20px #00ffe1;
+  }
+
+  .qr-code img {
+    width: 220px;
+    height: auto;
+    margin-top: 1.5rem;
+    border: 3px solid #00ffae;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #00ffe1;
+  }
+
+  .file-info {
+    margin-top: 2rem;
+  }
+
+  .code-box {
+    background: #121e2e;
+    color: #00ffae;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+
+  .download-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #00ffe1;
+    font-weight: 600;
+    text-decoration: underline;
+    font-size: 1.1rem;
+  }
+
+  .error-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid red;
+    color: #ff5555;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 576px) {
+    .btn-share {
+      font-size: 1rem;
+      padding: 0.7rem 1.5rem;
+    }
+
+    .qr-code img {
+      width: 180px;
+    }
+
+    .share-container {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<div class="container share-container" data-aos="fade-up" data-aos-duration="1000" role="main" aria-labelledby="shareFileHeading">
+  <h1 id="shareFileHeading">📤 Share Your File Securely</h1>
+  <p class="fs-5 text-light mb-4">Upload a file and receive a secure PIN + QR code to share.</p>
+
+  <form method="POST" enctype="multipart/form-data" aria-describedby="uploadInstructions">
+    {% csrf_token %}
+    <div class="form-group file-upload" role="button" aria-label="Click to upload a file">
+      <label for="fileInput" class="form-label">Select File</label>
+      <input type="file" name="file" id="fileInput" class="form-control" required aria-required="true" />
+      <small id="uploadInstructions" class="text-light">File size must be within sharing limits.</small>
+    </div>
+
+    <button type="submit" class="btn btn-share" aria-label="Secure and Share File">🔐 SecureX - Share</button>
+  </form>
+
+  {% if error %}
+    <div class="error-box" role="alert">
+      ❌ {{ error }}
+    </div>
+  {% endif %}
+
+  {% if success %}
+    <div class="file-info" aria-live="polite" aria-atomic="true">
+      <h3 class="text-success mt-4">✅ File Shared Successfully!</h3>
+      <p class="mt-2">Share this <strong>PIN</strong> & scan the <strong>QR code</strong> to access the file:</p>
+
+      <div class="code-box" aria-label="PIN Code">{{ pin }}</div>
+
+      <div class="qr-code mt-3" role="img" aria-label="QR code for file access">
+        <img src="{{ qr_code_url }}" alt="QR Code to access file" />
+      </div>
+
+      <p class="text-light mt-3">🔗 The recipient can access the file by scanning the QR code and entering the PIN.</p>
+
+      {% if file_url %}
+        <a class="download-link" href="{{ file_url }}" download target="_blank" aria-label="Download shared file">
+          ⬇️ Download File
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Functionality Overview | SecureFileX{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<canvas id="binaryRain" aria-hidden="true"></canvas>
+
+<div class="container main-content text-light">
+  <h1 class="text-center text-info mb-4">🔍 SecureFileX Functionality Overview</h1>
+  <div class="typing-text text-center">Explore the powerful features of our secure file management platform.</div>
+
+  <div class="why-secure text-light">
+    SecureFileX combines modern cryptography, steganography, and file sharing techniques with a visually rich interface to ensure your data remains private, secure, and easy to manage.
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-dark table-bordered table-hover text-center align-middle">
+      <thead class="table-info">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Feature</th>
+          <th scope="col">Description</th>
+          <th scope="col">Access</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <tr>
+          <th scope="row">1</th>
+          <td>File Encryption</td>
+          <td>Encrypt files using AES-GCM, ChaCha20, Fernet, or RSA with user-specified keys or passwords.</td>
+          <td>Logged-in Users</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>File Decryption</td>
+          <td>Decrypt previously encrypted files using correct keys, metadata, or tags/nonces as needed.</td>
+          <td>Logged-in Users</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>Secure Sharing</td>
+          <td>Upload files and generate a short PIN-protected QR code link for others to download securely.</td>
+          <td>Logged-in Users</td>
+        </tr>
+        <tr>
+          <th scope="row">4</th>
+          <td>Steganography</td>
+          <td>Hide or extract secret messages inside image files using LSB encoding.</td>
+          <td>Logged-in Users</td>
+        </tr>
+        <tr>
+          <th scope="row">5</th>
+          <td>Key Generation</td>
+          <td>Dynamically generate secure cryptographic keys for different algorithms including RSA and ChaCha20.</td>
+          <td>All Users</td>
+        </tr>
+        <tr>
+          <th scope="row">6</th>
+          <td>Algorithm Comparison</td>
+          <td>View detailed comparisons (speed, strength, use cases) for supported algorithms via charts and tables.</td>
+          <td>All Users</td>
+        </tr>
+        <tr>
+          <th scope="row">7</th>
+          <td>CyberChef Integration</td>
+          <td>Launch an embedded CyberChef instance for additional encoding, decoding, and analysis operations.</td>
+          <td>Logged-in Users</td>
+        </tr>
+        <tr>
+          <th scope="row">8</th>
+          <td>Audit Logging</td>
+          <td>Track encryption, decryption, and sharing activities per user in secure logs (admin access).</td>
+          <td>Admins Only</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="{% url 'home' %}" class="btn btn-outline-info rounded-pill px-4 py-2">⬅ Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

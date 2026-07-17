@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Demo Mode | SecureFileX{% endblock %}
+
+{% block content %}
+<!-- Link Global Style -->
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+<!-- Binary Rain Canvas -->
+<canvas id="binaryCanvas"></canvas>
+
+<!-- Demo Info Card -->
+<div class="glass-card animate__animated animate__fadeIn text-center text-light mt-5 px-4 py-5">
+  <h1 class="text-info fw-bold mb-3">🔒 Demo Mode</h1>
+  <p>This is a limited version of <strong>SecureFileX</strong>.</p>
+  <p class="text-muted">To unlock full features like AI-generated keys, audit logs, and secure steganography — please log in or register.</p>
+
+  <ul class="list-unstyled text-start mt-4 small">
+    <li><i class="fa-solid fa-lock text-info me-2"></i><strong>File Encryption</strong> (disabled in demo)</li>
+    <li><i class="fa-solid fa-unlock text-info me-2"></i><strong>Decryption Tool</strong> (view-only)</li>
+    <li><i class="fa-solid fa-hashtag text-info me-2"></i><strong>Hashing Utility</strong> (SHA256, Bcrypt)</li>
+    <li><i class="fa-solid fa-robot text-info me-2"></i><strong>AI Suggestions</strong> (locked)</li>
+    <li><i class="fa-solid fa-vault text-info me-2"></i><strong>Key Vault</strong> (access restricted)</li>
+    <li><i class="fa-solid fa-image text-info me-2"></i><strong>Image Steganography</strong> (read-only)</li>
+    <li><i class="fa-solid fa-headphones text-info me-2"></i><strong>Audio Stego</strong> (locked)</li>
+    <li><i class="fa-solid fa-chart-line text-info me-2"></i><strong>Algorithm Logs</strong> (dashboard preview)</li>
+    <li><i class="fa-solid fa-flask text-info me-2"></i><strong>CyberChef Access</strong> (✅ Available)</li>
+  </ul>
+
+  <a href="https://gchq.github.io/CyberChef/" target="_blank" class="btn btn-glow mt-3">🚀 Launch CyberChef</a>
+
+  <div class="mt-4">
+    <a href="{% url 'login' %}" class="btn btn-outline-info me-2">🔐 Log In</a>
+    <a href="{% url 'signup' %}" class="btn btn-outline-success">🧾 Sign Up</a>
+  </div>
+</div>
+
+<!-- Binary Rain Script -->
+<script>
+  const canvas = document.getElementById("binaryCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const binary = "01";
+  const fontSize = 16;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00f7ff";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = binary[Math.floor(Math.random() * binary.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+
+  setInterval(draw, 34);
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+{% endblock %}

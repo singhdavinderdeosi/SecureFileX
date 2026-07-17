@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home | SecureFileX{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+  body {
+    background-color: #040404;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  body.dark-theme {
+    color: #00ff88;
+  }
+
+  canvas#binaryRain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.08;
+  }
+
+  .main-content {
+    position: relative;
+    z-index: 2;
+    padding-top: 100px;
+    padding-bottom: 60px;
+  }
+
+  .typing-text {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #00ffee;
+    margin-bottom: 2rem;
+    min-height: 40px;
+    transition: all 0.4s ease-in-out;
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.6rem;
+    margin-top: 2rem;
+  }
+
+  .tool-card {
+    background: rgba(0, 255, 255, 0.06);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    padding: 2rem 1.2rem;
+    border-radius: 16px;
+    color: inherit;
+    text-align: center;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s;
+    backdrop-filter: blur(14px);
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+
+  .tool-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.35);
+  }
+
+  .tool-card i {
+    font-size: 2.2rem;
+    margin-bottom: 0.6rem;
+    color: #00ffff;
+    transition: color 0.3s ease;
+  }
+
+  body.dark-theme .tool-card i {
+    color: #00ff88;
+  }
+
+  .why-secure {
+    background: rgba(0, 0, 0, 0.5);
+    border-left: 4px solid #00ffee;
+    padding: 1.8rem;
+    border-radius: 12px;
+    margin-bottom: 3.5rem;
+    color: inherit;
+    font-size: 1.05rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.07);
+  }
+</style>
+
+<canvas id="binaryRain"></canvas>
+
+<div class="container main-content text-light text-center">
+  <h1 class="display-5 fw-bold text-info mb-4">🔐 SecureFileX</h1>
+  <div class="typing-text" id="typing-text"></div>
+  <p class="text mb-5">Your all-in-one suite for encrypted communication, secure storage, and forensic steganography.</p>
+
+  <div class="why-secure text-start" data-aos="fade-right">
+    <h4 class="text-info"><i class="fa-solid fa-shield-halved me-2"></i>Why Encryption & Decryption Matter</h4>
+    <p>
+      Encryption protects your sensitive data from unauthorized access. Whether transmitting over networks or storing files locally, encryption ensures your data stays private. Decryption allows only those with permission to access the content — forming the backbone of digital trust and privacy.
+    </p>
+  </div>
+
+  <div class="bento-grid" data-aos="fade-up" data-aos-delay="100">
+    <a href="{% url 'encrypt_file' %}" class="tool-card d-block">
+      <i class="fa fa-lock"></i><br>Encrypt
+    </a>
+    <a href="{% url 'decrypt' %}" class="tool-card d-block">
+      <i class="fa fa-unlock"></i><br>Decrypt
+    </a>
+    <a href="{% url 'steganography' %}" class="tool-card d-block">
+      <i class="fa fa-image"></i><br>Steganography
+    </a>
+    <a href="{% url 'algo_comparison' %}" class="tool-card d-block">
+      <i class="fa fa-shield-halved"></i><br>Algo Comparison
+    </a>
+    <a href="/cyberchef/" class="tool-card d-block">
+      <i class="fa-solid fa-flask"></i><br>CyberChef (Local)
+    </a>
+  </div>
+</div>
+
+<!-- Binary Rain Script -->
+<script>
+  const canvas = document.getElementById("binaryRain");
+  const ctx = canvas.getContext("2d");
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  let fontSize = 16;
+  let columns = Math.floor(width / fontSize);
+  let drops = Array(columns).fill(1);
+  const binary = "01";
+
+  canvas.width = width;
+  canvas.height = height;
+
+  function drawRain() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = document.body.classList.contains("dark-theme") ? "#00ff99" : "#00ffee";
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = binary[Math.floor(Math.random() * binary.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+
+  let rainInterval = setInterval(drawRain, 40);
+
+  window.addEventListener("resize", () => {
+    clearInterval(rainInterval);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    columns = Math.floor(width / fontSize);
+    drops = Array(columns).fill(1);
+    rainInterval = setInterval(drawRain, 40);
+  });
+</script>
+
+<!-- Typing Animation -->
+<script>
+  const typingTarget = document.getElementById("typing-text");
+  const typingPhrases = [
+    "Encrypt with confidence.",
+    "Decrypt securely.",
+    "Hide your secrets in plain sight.",
+    "Your privacy, redefined."
+  ];
+  let phraseIndex = 0, letterIndex = 0, deleting = false;
+
+  function typeEffect() {
+    const currentPhrase = typingPhrases[phraseIndex];
+    typingTarget.textContent = deleting
+      ? currentPhrase.slice(0, --letterIndex)
+      : currentPhrase.slice(0, ++letterIndex);
+
+    if (!deleting && letterIndex === currentPhrase.length + 1) {
+      deleting = true;
+      setTimeout(typeEffect, 900);
+    } else if (deleting && letterIndex === 0) {
+      deleting = false;
+      phraseIndex = (phraseIndex + 1) % typingPhrases.length;
+      setTimeout(typeEffect, 300);
+    } else {
+      setTimeout(typeEffect, deleting ? 50 : 100);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    typeEffect();
+  });
+</script>
+
+<!-- AOS Animations -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
+{% endblock %}

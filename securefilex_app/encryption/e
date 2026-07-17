@@ -1,0 +1,316 @@
+import os
+import json
+import base64
+import secrets
+import xml.etree.ElementTree as ET
+import re
+from hashlib import sha256
+from mimetypes import guess_type
+from django.conf import settings
+from base64 import urlsafe_b64encode
+from celery import shared_task
+import pyzipper
+
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
+
+
+# -------------------------------
+# Configurations
+# -------------------------------
+
+MAX_FILE_SIZE_MB = 50  # File size limit for uploads
+
+
+# -------------------------------
+# Password Strength Enforcement
+# -------------------------------
+
+def validate_password_strength(password):
+    if (len(password) < 8 or
+        not re.search(r"[A-Z]", password) or
+        not re.search(r"[a-z]", password) or
+        not re.search(r"[0-9]", password) or
+        not re.search(r"[\W_]", password)):
+        raise ValueError(
+            "Password must be at least 8 characters long, "
+            "include uppercase, lowercase, number, and special character."
+        )
+
+
+# -------------------------------
+# File Size Check
+# -------------------------------
+
+def check_file_size(file):
+    size_mb = file.size / (1024 * 1024)
+    if size_mb > MAX_FILE_SIZE_MB:
+        raise ValueError(f"File size {size_mb:.2f} MB exceeds limit of {MAX_FILE_SIZE_MB} MB.")
+
+
+# -------------------------------
+# Secure Key Generation
+# -------------------------------
+
+def generate_secure_key(length=32):
+    return secrets.token_bytes(length)
+
+
+def generate_key_from_passphrase(passphrase, algorithm):
+    algo = algorithm.upper()
+    validate_password_strength(passphrase)
+    if algo == "FERNET":
+        # Fernet key must be URL-safe base64 32 bytes
+        return urlsafe_b64encode(sha256(passphrase.encode()).digest())
+    elif algo in ("CHACHA20", "AES-GCM"):
+        # Raw 32 bytes key
+        return sha256(passphrase.encode()).digest()
+    else:
+        raise ValueError("Unsupported algorithm for key generation")
+
+
+# -------------------------------
+# XML Metadata Helpers
+# -------------------------------
+
+def save_metadata_xml(path, data):
+    root = ET.Element("EncryptionMetadata")
+    for key, value in data.items():
+        child = ET.SubElement(root, key)
+        child.text = value if value else ''
+    tree = ET.ElementTree(root)
+    tree.write(path, encoding="utf-8", xml_declaration=True)
+
+
+def load_metadata_xml(path):
+    tree = ET.parse(path)
+    root = tree.getroot()
+    return {child.tag: child.text for child in root}
+
+
+# -------------------------------
+# ZIP Archive Helpers
+# -------------------------------
+
+def create_encrypted_zip(files, password, output_path):
+    validate_password_strength(password)
+    with pyzipper.AESZipFile(output_path, 'w', compression=pyzipper.ZIP_DEFLATED, encryption=pyzipper.WZ_AES) as zf:
+        zf.setpassword(password.encode())
+        for f in files:
+            zf.write(f.path, arcname=os.path.basename(f.name))
+
+
+def extract_encrypted_zip(zip_path, password, extract_dir):
+    with pyzipper.AESZipFile(zip_path) as zf:
+        zf.setpassword(password.encode())
+        zf.extractall(path=extract_dir)
+
+
+# -------------------------------
+# Encryption Logic
+# -------------------------------
+
+def encrypt_file(file, algorithm, user, user_key=None):
+    check_file_size(file)
+
+    content = file.read()
+    original_filename = os.path.basename(file.name)
+    algo = algorithm.upper()
+
+    encrypted_data = None
+    key, nonce, tag = None, None, None
+
+    # Key Generation
+    if user_key:
+        key = generate_key_from_passphrase(user_key, algo)
+    else:
+        if algo == "FERNET":
+            key = Fernet.generate_key()
+        elif algo in ("CHACHA20", "AES-GCM"):
+            key = generate_secure_key(32)
+        elif algo == "RSA":
+            private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            key = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            public_key = private_key.public_key()
+        else:
+            raise ValueError("Unsupported encryption algorithm")
+
+    # Encryption
+    if algo == "FERNET":
+        fernet = Fernet(key)
+        encrypted_data = fernet.encrypt(content)
+
+    elif algo == "CHACHA20":
+        nonce = generate_secure_key(16)
+        cipher = Cipher(algorithms.ChaCha20(key, nonce), mode=None)
+        encryptor = cipher.encryptor()
+        encrypted_data = encryptor.update(content) + encryptor.finalize()
+
+    elif algo == "AES-GCM":
+        nonce = generate_secure_key(12)
+        cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+        encryptor = cipher.encryptor()
+        encrypted_data = encryptor.update(content) + encryptor.finalize()
+        tag = encryptor.tag
+
+    elif algo == "RSA":
+        encrypted_data = public_key.encrypt(
+            content,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+    else:
+        raise ValueError("Unsupported encryption algorithm")
+
+    # Save encrypted file
+    encrypted_dir = os.path.join(settings.MEDIA_ROOT, "encrypted", user.username)
+    os.makedirs(encrypted_dir, exist_ok=True)
+    encrypted_filename = original_filename + ".enc"
+    encrypted_path = os.path.join(encrypted_dir, encrypted_filename)
+
+    with open(encrypted_path, 'wb') as f:
+        f.write(encrypted_data)
+
+    # Metadata dictionary
+    metadata = {
+        "algorithm": algo,
+        "key": base64.b64encode(key).decode() if key else '',
+        "nonce": base64.b64encode(nonce).decode() if nonce else '',
+        "tag": base64.b64encode(tag).decode() if tag else ''
+    }
+
+    # Save metadata in JSON, XML, and .keys
+    with open(encrypted_path + ".json", 'w') as jf:
+        json.dump(metadata, jf, indent=2)
+    save_metadata_xml(encrypted_path + ".xml", metadata)
+    with open(encrypted_path + ".keys", 'w') as kf:
+        json.dump(metadata, kf, indent=2)
+
+    return encrypted_data, encrypted_filename
+
+
+# -------------------------------
+# Decryption Logic
+# -------------------------------
+
+def decrypt_file(file, user, user_key=None, nonce_b64=None, tag_b64=None, algo_override=None):
+    check_file_size(file)
+
+    content = file.read()
+    encrypted_filename = os.path.basename(file.name)
+
+    if not encrypted_filename.endswith(".enc"):
+        raise ValueError("Invalid file type: must end with .enc")
+
+    original_filename = encrypted_filename[:-4]
+    encrypted_dir = os.path.join(settings.MEDIA_ROOT, "encrypted", user.username)
+
+    metadata = None
+    metadata_paths = [
+        os.path.join(encrypted_dir, encrypted_filename + ".json"),
+        os.path.join(encrypted_dir, encrypted_filename + ".xml"),
+        os.path.join(encrypted_dir, encrypted_filename + ".keys")
+    ]
+
+    # Load metadata from JSON → XML → .keys
+    for path in metadata_paths:
+        if os.path.exists(path):
+            try:
+                if path.endswith(".json") or path.endswith(".keys"):
+                    with open(path, 'r') as f:
+                        metadata = json.load(f)
+                elif path.endswith(".xml"):
+                    metadata = load_metadata_xml(path)
+                break
+            except Exception as e:
+                # If corrupted metadata, ignore and try next
+                continue
+
+    # Parse metadata or fallback to manual override
+    if metadata:
+        algo = metadata.get("algorithm", "").upper()
+        key = base64.b64decode(metadata["key"]) if metadata.get("key") else None
+        nonce = base64.b64decode(metadata["nonce"]) if metadata.get("nonce") else None
+        tag = base64.b64decode(metadata["tag"]) if metadata.get("tag") else None
+    else:
+        if not algo_override or not user_key:
+            raise ValueError("Missing metadata and manual override data")
+        algo = algo_override.upper()
+        key = generate_key_from_passphrase(user_key, algo)
+        nonce = base64.b64decode(nonce_b64) if nonce_b64 else None
+        tag = base64.b64decode(tag_b64) if tag_b64 else None
+
+    # Override key if user_key provided (manual override or not)
+    if user_key:
+        key = generate_key_from_passphrase(user_key, algo)
+
+    # Decryption
+    if algo == "FERNET":
+        fernet = Fernet(key)
+        decrypted_data = fernet.decrypt(content)
+
+    elif algo == "CHACHA20":
+        if not nonce:
+            raise ValueError("Nonce is required for ChaCha20 decryption")
+        cipher = Cipher(algorithms.ChaCha20(key, nonce), mode=None)
+        decryptor = cipher.decryptor()
+        decrypted_data = decryptor.update(content) + decryptor.finalize()
+
+    elif algo == "AES-GCM":
+        if not (nonce and tag):
+            raise ValueError("Nonce and tag required for AES-GCM decryption")
+        cipher = Cipher(algorithms.AES(key), modes.GCM(nonce, tag))
+        decryptor = cipher.decryptor()
+        decrypted_data = decryptor.update(content) + decryptor.finalize()
+
+    elif algo == "RSA":
+        private_key = serialization.load_pem_private_key(key, password=None)
+        decrypted_data = private_key.decrypt(
+            content,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+    else:
+        raise ValueError("Unsupported decryption algorithm")
+
+    return decrypted_data, original_filename
+
+
+# -------------------------------
+# Celery Async Tasks
+# -------------------------------
+
+@shared_task
+def async_encrypt(file_path, algorithm, username, user_key=None):
+    from django.contrib.auth.models import User
+    user = User.objects.get(username=username)
+
+    with open(file_path, 'rb') as f:
+        encrypted_data, encrypted_filename = encrypt_file(f, algorithm, user, user_key)
+    # Add notifications or further processing here
+    return encrypted_filename
+
+
+@shared_task
+def async_decrypt(file_path, username, user_key=None, nonce_b64=None, tag_b64=None, algo_override=None):
+    from django.contrib.auth.models import User
+    user = User.objects.get(username=username)
+
+    with open(file_path, 'rb') as f:
+        decrypted_data, original_filename = decrypt_file(f, user, user_key, nonce_b64, tag_b64, algo_override)
+    # Save decrypted data or notify user here
+    return original_filename

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Steganography | SecureFileX{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+  .drop-zone {
+    border: 2px dashed #17a2b8;
+    background: #1a1a1a;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 10px;
+    color: #ccc;
+    transition: background 0.3s;
+  }
+  .drop-zone.dragover {
+    background: #10343a;
+    border-color: #00f2ff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="binary-bg">
+  <div class="container py-5">
+    <div class="text-center mb-4">
+      <h2 class="display-5 fw-bold text-info">🖼️ Image Steganography</h2>
+      <p class="text-white-50">Hide or extract secret messages from images instantly.</p>
+    </div>
+
+    <div id="toastArea" class="mb-3"></div>
+
+    <!-- Mode Toggle -->
+    <div class="text-center mb-4">
+      <div class="btn-group" role="group">
+        <button id="btnEncode" class="btn btn-outline-info active" onclick="toggleMode('hide')">🔐 Encode</button>
+        <button id="btnDecode" class="btn btn-outline-warning" onclick="toggleMode('extract')">📤 Decode</button>
+      </div>
+    </div>
+
+    <!-- Steganography Form -->
+    <form id="stegForm" enctype="multipart/form-data"
+      class="card bg-dark text-light p-4 rounded-4 border-info shadow-lg" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="mode" id="modeInput" value="hide">
+
+      <!-- Encode Section -->
+      <div id="encodeFields">
+        <!-- Drag & Drop -->
+        <div id="dropArea" class="drop-zone mb-3">
+          <p>🖼️ Drag & drop image here or click to select</p>
+          <input type="file" name="image" accept="image/*" id="imageInput" hidden required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">✉️ Secret Message</label>
+          <textarea name="message" rows="3"
+            class="form-control bg-dark text-light border-info"
+            placeholder="Enter secret message..." required></textarea>
+        </div>
+      </div>
+
+      <!-- Decode Section -->
+      <div id="decodeFields" style="display:none;">
+        <div class="mb-3">
+          <label class="form-label">🔍 Select Stego Image</label>
+          <input type="file" name="stego_image" accept="image/*"
+            class="form-control bg-dark text-light border-warning" required>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div id="progressBar" class="progress my-3" style="display:none;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width:0%"></div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submitBtn" class="btn btn-outline-info w-100 mt-2 fw-bold">🔐 Hide Message</button>
+    </form>
+
+    <!-- Output Image -->
+    <div id="outputImage" class="text-center mt-4" style="display:none;">
+      <h5 class="text-info">✅ Stego Image Created</h5>
+      <img id="previewImage" class="img-thumbnail mt-3" style="max-width:300px" alt="Preview">
+      <div class="mt-3">
+        <a id="downloadLink" class="btn btn-success" download>📥 Download</a>
+      </div>
+    </div>
+
+    <!-- Output Text -->
+    <div id="outputText" class="mt-5" style="display:none;">
+      <h5 class="text-info">📝 Extracted Message</h5>
+      <pre id="revealedText" class="bg-dark text-white p-3 rounded border border-success"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  const form = document.getElementById('stegForm');
+  const encodeFields = document.getElementById('encodeFields');
+  const decodeFields = document.getElementById('decodeFields');
+  const modeInput = document.getElementById('modeInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const progress = document.getElementById('progressBar');
+  const toastArea = document.getElementById('toastArea');
+  const outputImage = document.getElementById('outputImage');
+  const previewImage = document.getElementById('previewImage');
+  const downloadLink = document.getElementById('downloadLink');
+  const outputText = document.getElementById('outputText');
+  const revealedText = document.getElementById('revealedText');
+
+  const dropArea = document.getElementById('dropArea');
+  const imageInput = document.getElementById('imageInput');
+
+  function toggleMode(mode) {
+    const isHide = mode === 'hide';
+    encodeFields.style.display = isHide ? '' : 'none';
+    decodeFields.style.display = isHide ? 'none' : '';
+    modeInput.value = mode;
+    submitBtn.innerHTML = isHide ? '🔐 Hide Message' : '📤 Extract Message';
+    document.getElementById('btnEncode').classList.toggle('active', isHide);
+    document.getElementById('btnDecode').classList.toggle('active', !isHide);
+    outputImage.style.display = 'none';
+    outputText.style.display = 'none';
+  }
+
+  // Drag & Drop functionality
+  dropArea.addEventListener('click', () => imageInput.click());
+  dropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+  });
+  dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+  dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    imageInput.files = e.dataTransfer.files;
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    progress.style.display = '';
+    progress.querySelector('.progress-bar').style.width = '0%';
+
+    const formData = new FormData(form);
+    const mode = modeInput.value;
+
+    // If hiding, check image capacity
+    if (mode === 'hide') {
+      const msg = form.querySelector('textarea[name="message"]').value;
+      const totalBits = (msg.length + 2) * 8;
+      const requiredPixels = Math.ceil(totalBits / 3);
+      const file = imageInput.files[0];
+
+      if (!file) {
+        showToast('❌ Please select an image.', false);
+        progress.style.display = 'none';
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        const availablePixels = img.width * img.height;
+        if (requiredPixels > availablePixels) {
+          showToast(`❌ Message too long! Needs ~${requiredPixels} pixels, but image has only ${availablePixels}.`, false);
+          progress.style.display = 'none';
+        } else {
+          sendAjax(formData);
+        }
+      };
+      img.src = URL.createObjectURL(file);
+    } else {
+      sendAjax(formData);
+    }
+  });
+
+  function sendAjax(formData) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "{% url 'steganography' %}");
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    xhr.upload.onprogress = function (e) {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        progress.querySelector('.progress-bar').style.width = `${percent}%`;
+      }
+    };
+
+    xhr.onload = function () {
+      progress.style.display = 'none';
+      try {
+        const json = JSON.parse(xhr.responseText);
+        showToast(json.message, json.success);
+        if (json.success && json.output_image_path) {
+          previewImage.src = json.output_image_path;
+          downloadLink.href = json.output_image_path;
+          outputImage.style.display = '';
+        }
+        if (json.success && json.hidden_text) {
+          revealedText.textContent = json.hidden_text;
+          outputText.style.display = '';
+        }
+      } catch {
+        showToast('❌ Invalid response from server.', false);
+      }
+    };
+
+    xhr.onerror = function () {
+      progress.style.display = 'none';
+      showToast('❌ Upload failed. Try again.', false);
+    };
+
+    xhr.send(formData);
+  }
+
+  function showToast(msg, ok) {
+    toastArea.innerHTML = `
+      <div class="alert ${ok ? 'alert-success' : 'alert-danger'} alert-dismissible fade show" role="alert">
+        ${msg}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>`;
+  }
+</script>
+{% endblock %}

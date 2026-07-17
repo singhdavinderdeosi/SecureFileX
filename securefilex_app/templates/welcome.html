@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SecureFileX | Cyber Secure{% endblock %}
+
+{% block content %}
+
+<!-- 🔹 Intro Screen -->
+<div id="introScreen" class="intro-overlay">
+  <span id="introText" class="typing-text glow-neon">SecureFileX- Lock Down Data, Unlock Trust</span> 
+  <audio id="introSound" src="{% static 'audio/startup.mp3' %}" autoplay></audio>
+</div>
+
+<!-- 🚀 Hero Section -->
+<section class="hero-section d-flex flex-column justify-content-center align-items-center text-light">
+  <canvas id="binaryCanvas"></canvas>
+  <div id="bgOverlay"></div>
+
+  <div class="container text-center py-5 position-relative">
+    <h1 class="neon-title mb-4 animate__animated animate__fadeInDown">🔐 Welcome to <span class="text-cyan">SecureFileX</span></h1>
+    <p class="lead neon-subtext animate__animated animate__fadeInUp">Cyber-grade encryption. Transparent logs. Your control, elevated.</p>
+
+    <!-- ⚡ Role-Based Cards -->
+    <div class="row g-4 justify-content-center mt-5">
+      {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-danger neon-glow-red animate__animated animate__fadeInUp">
+            <h5><i class="fa-solid fa-user-shield text-danger me-2"></i>Admin Console</h5>
+            <p>Manage users and advanced tools.</p>
+            <a href="{% url 'admin:index' %}" class="btn btn-neon-red w-100">Admin Panel</a>
+          </div>
+        </div>
+        {% elif user.groups.first.name == 'PowerUser' %}
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-warning neon-glow-yellow animate__animated animate__fadeInUp animate__delay-1s">
+            <h5><i class="fa-solid fa-bolt text-warning me-2"></i>Power Dashboard</h5>
+            <p>Vault insights and AI analytics.</p>
+            <a href="{% url 'home' %}" class="btn btn-neon-yellow w-100">Power Access</a>
+          </div>
+        </div>
+        {% else %}
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-info neon-glow-cyan animate__animated animate__fadeInUp animate__delay-2s">
+            <h5><i class="fa-solid fa-user-lock text-info me-2"></i>User Dashboard</h5>
+            <p>Encrypt, decrypt, and monitor files.</p>
+            <a href="{% url 'home' %}" class="btn btn-neon-cyan w-100">Dashboard</a>
+          </div>
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-info neon-glow-cyan animate__animated animate__fadeInUp">
+            <h5><i class="fa-solid fa-lock text-info me-2"></i>Login</h5>
+            <p>Access your secure vault now.</p>
+            <a href="{% url 'login' %}" class="btn btn-neon-cyan w-100">Login</a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-success neon-glow-green animate__animated animate__fadeInUp animate__delay-1s">
+            <h5><i class="fa-solid fa-user-plus text-success me-2"></i>Register</h5>
+            <p>Start encrypting with full control.</p>
+            <a href="{% url 'signup' %}" class="btn btn-neon-green w-100">Sign Up</a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <div class="neon-card border-warning neon-glow-yellow animate__animated animate__fadeInUp animate__delay-2s">
+            <h5><i class="fa-solid fa-rocket text-warning me-2"></i>Try Demo</h5>
+            <p>Test SecureFileX without signup.</p>
+            <a href="{% url 'demo_mode' %}" class="btn btn-neon-yellow w-100">Demo Mode</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- 🌌 Custom Styles -->
+<style>
+  html, body {
+    background: #0a0a0a;
+    color: #0ff;
+    overflow-x: hidden;
+  }
+
+  #introScreen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeOut 1.5s ease 4.5s forwards;
+  }
+
+  .typing-text {
+    font-size: 3.5rem;
+    font-family: 'Courier New', monospace;
+    border-right: 3px solid #0ff;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 2.8s steps(30, end), blink 0.75s step-end infinite;
+    color: #0ff;
+    opacity: 0.9;
+  }
+
+  @keyframes typing { from { width: 0; } to { width: 30ch; } }
+  @keyframes blink { 50% { border-color: transparent; } }
+  @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+  canvas#binaryCanvas, #bgOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #bgOverlay {
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.9), #000);
+    opacity: 0.6;
+  }
+
+  .hero-section {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+  }
+
+  .neon-title {
+    font-size: 2.8rem;
+    text-shadow: 0 0 8px #0ff, 0 0 20px #00f0ff;
+  }
+
+  .neon-subtext {
+    text-shadow: 0 0 5px #00f0ff;
+    color: #9ef;
+  }
+
+  .neon-card {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    color: white;
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(0,255,255,0.2);
+  }
+
+  .neon-card:hover {
+    transform: scale(1.05);
+  }
+
+  .btn-neon-cyan { border-color: #00f0ff; color: #00f0ff; }
+  .btn-neon-cyan:hover { background: #00f0ff; color: #000; }
+
+  .btn-neon-green { border-color: #00ff90; color: #00ff90; }
+  .btn-neon-green:hover { background: #00ff90; color: #000; }
+
+  .btn-neon-yellow { border-color: #ffc107; color: #ffc107; }
+  .btn-neon-yellow:hover { background: #ffc107; color: #000; }
+
+  .btn-neon-red { border-color: #ff4d4d; color: #ff4d4d; }
+  .btn-neon-red:hover { background: #ff4d4d; color: #000; }
+
+  .neon-glow-cyan:hover { box-shadow: 0 0 15px #00f0ff; }
+  .neon-glow-yellow:hover { box-shadow: 0 0 15px #ffc107; }
+  .neon-glow-green:hover { box-shadow: 0 0 15px #00ff90; }
+  .neon-glow-red:hover { box-shadow: 0 0 15px #ff4d4d; }
+</style>
+
+<!-- 💻 Matrix Script -->
+<script>
+  const canvas = document.getElementById("binaryCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+  const binaryChars = "01";
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#00f0ff";
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = binaryChars[Math.floor(Math.random() * binaryChars.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 33);
+
+  // Custom greeting animation text update, no redirect now
+
+  const introText = document.getElementById('introText');
+
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    else if (hour < 18) return "Good Afternoon";
+    else return "Good Evening";
+  }
+
+  const userIsAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+  const userName = "{{ user.username|default_if_none:'' }}";
+
+  function updateIntroText() {
+    const greet = getGreeting();
+    if (userIsAuthenticated && userName) {
+      introText.textContent = `${greet}, ${userName}! Welcome to SecureFileX 🔐`;
+    } else {
+      introText.textContent = `${greet}! Welcome to SecureFileX 🔐`;
+    }
+  }
+
+  // Replace intro text after 500ms for a smooth effect
+  setTimeout(updateIntroText, 500);
+
+</script>
+
+{% endblock %}

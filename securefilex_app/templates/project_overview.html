@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Project Overview | SecureFileX{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<canvas id="binaryRain" aria-hidden="true"></canvas>
+
+<div class="container py-5 main-content text-light animate__animated animate__fadeIn">
+  <div class="glass-card p-5">
+    <h1 class="display-5 fw-bold text-info text-center mb-4">🔐 SecureFileX</h1>
+    <p class="lead text-center text-light mb-5">Secure Encryption, Decryption, and Sharing Platform</p>
+
+    <h3 class="text-info">📌 Overview</h3>
+    <p>SecureFileX is a powerful web-based tool built with Django that enables secure file encryption, decryption, and sharing using modern cryptographic algorithms. It offers a visually rich and accessible user interface with strong cryptographic backend support.</p>
+
+    <h4 class="text-info mt-4">🚀 Key Features</h4>
+    <ul>
+      <li><strong>Multi-Algorithm Support:</strong> Fernet, ChaCha20, AES-GCM, RSA</li>
+      <li><strong>AI-Powered Algorithm Suggestions:</strong> Based on file type, size & sensitivity</li>
+      <li><strong>QR Code & PIN Sharing:</strong> Secure link generation and QR access</li>
+      <li><strong>Metadata + Key File Output:</strong> For reproducible decryption (.json + .keys)</li>
+      <li><strong>Steganography:</strong> Hide and extract secret messages in images</li>
+      <li><strong>Progressive Glassmorphism UI:</strong> Step-by-step wizard with binary rain background</li>
+    </ul>
+
+    <h4 class="text-info mt-4">🔧 Technology Stack</h4>
+    <ul>
+      <li><strong>Backend:</strong> Django, Python,cryptography, PyCryptodome</li>
+      <li><strong>Frontend:</strong> Bootstrap 5, AJAX, JavaScript, Canvas</li>
+      <li><strong>Steganography:</strong> PIL (Python Imaging Library)</li>
+    </ul>
+
+    <h4 class="text-info mt-4">📂 Output File Structure</h4>
+    <pre class="bg-dark text-light p-3 rounded">
+/media/encrypted/&lt;username&gt;/
+  ├── &lt;filename&gt;.enc       # Encrypted file
+  ├── &lt;filename&gt;.json      # Metadata
+  ├── &lt;filename&gt;.keys      # Key file (optional)
+  └── &lt;filename&gt;_qr.png    # QR code for sharing
+    </pre>
+
+    <h4 class="text-info mt-4">🛡️ Security & Privacy</h4>
+    <ul>
+      <li>No permanent key storage on server</li>
+      <li>RSA keys provided as downloadable PEM files</li>
+      <li>User-specific encrypted/decrypted directories</li>
+      <li>PIN-based access for shared files</li>
+    </ul>
+
+    <h4 class="text-info mt-4">📈 Future Improvements</h4>
+    <ul>
+      <li>Auto-expiry of links and PINs</li>
+      <li>Cloud integration (e.g., S3)</li>
+      <li>File audit logging</li>
+      <li>Built-in virus scanning</li>
+    </ul>
+
+    <div class="text-center mt-5">
+      <a href="{% url 'encrypt' %}" class="btn btn-neon-green me-2">Start Encrypting</a>
+      <a href="{% url 'decrypt' %}" class="btn btn-outline-info">Start Decrypting</a>
+    </div>
+  </div>
+</div>
+
+<!-- Binary Rain Script -->
+<script>
+  const canvas = document.getElementById('binaryRain');
+  const ctx = canvas.getContext('2d');
+  const fontSize = 14, chars = '01';
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const cols = Math.floor(canvas.width / fontSize);
+  const drops = Array(cols).fill(1);
+  function drawRain() {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f0'; ctx.font = fontSize + 'px monospace';
+    drops.forEach((y, i) => {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, y * fontSize);
+      drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+    });
+  }
+  setInterval(drawRain, 50);
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+
+<style>
+  #binaryRain {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: black;
+  }
+  .main-content {
+    position: relative;
+    z-index: 1;
+  }
+  .glass-card {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+</style>
+{% endblock %}

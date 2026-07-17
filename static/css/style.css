@@ -1,0 +1,292 @@
+/* ======= Global Reset & Base ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Courier New', monospace;
+  background-color: #000b12;
+  color: #c7f5ff;
+  height: 100%;
+  scroll-behavior: smooth;
+  line-height: 1.6;
+}
+
+/* ======= Scrollbar Styling ======= */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #00f0ff;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00c0d0;
+}
+
+/* ======= Code Blocks ======= */
+pre, code {
+  font-family: 'Fira Code', monospace;
+  background-color: #061e26;
+  padding: 10px;
+  border-left: 3px solid #00f0ff;
+  border-radius: 4px;
+  overflow-x: auto;
+  color: #00eaff;
+}
+
+/* ======= Fullscreen Background Layer ======= */
+.fullscreen-bg {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  opacity: 0.15;
+  filter: blur(1px);
+}
+.fullscreen-bg::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 0;
+}
+
+/* ======= Cyber Navbar ======= */
+.navbar {
+  background-color: rgba(0, 26, 36, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #00f0ff33;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 255, 255, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar .logo-img {
+  height: 48px;
+  margin-right: 24px;
+  filter: drop-shadow(0 0 4px #00f0ff);
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar li a {
+  color: #00f0ff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.navbar li a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background-color: #00f0ff;
+  bottom: -4px;
+  left: 0;
+  transition: width 0.3s ease-in-out;
+}
+
+.navbar li a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 6px #00f0ff;
+}
+
+.navbar li a:hover::after {
+  width: 100%;
+}
+
+/* ======= Avatar Dropdown ======= */
+.avatar-dropdown .btn {
+  background-color: #111;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  color: #00f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s ease;
+}
+.avatar-dropdown .btn:hover {
+  box-shadow: 0 0 10px #00f0ff;
+}
+.avatar-dropdown .btn .online-dot {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  background-color: #00ff7f;
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+.avatar-dropdown .dropdown-menu {
+  background-color: #121212;
+  border: none;
+  box-shadow: 0 0 15px rgba(0,255,255,0.15);
+}
+.avatar-dropdown .dropdown-item {
+  color: #c7f5ff;
+  transition: background 0.2s ease;
+}
+.avatar-dropdown .dropdown-item:hover {
+  background-color: #001f2e;
+  color: #00f0ff;
+}
+
+/* ======= Mega Menu ======= */
+.mega-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  background-color: #0f1113;
+  border-top: 2px solid #00f0ff55;
+  display: none;
+  z-index: 100;
+}
+.nav-item:hover .mega-menu {
+  display: block;
+}
+
+/* ======= Main & Footer ======= */
+main {
+  padding: 40px 20px;
+  position: relative;
+  z-index: 1;
+}
+.footer {
+  background-color: #001f2e;
+  color: #7eeeff;
+  text-align: center;
+  padding: 16px 0;
+  width: 100%;
+  margin-top: 60px;
+  border-top: 1px solid #00f0ff22;
+}
+
+/* ======= Buttons & Utility ======= */
+.btn-cyber {
+  background: #001f2e;
+  color: #00f0ff;
+  border: 1px solid #00f0ff55;
+  padding: 8px 20px;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+.btn-cyber:hover {
+  background-color: #002a3d;
+  box-shadow: 0 0 10px #00f0ff;
+  color: #ffffff;
+}
+.text-glow {
+  color: #00f0ff;
+  text-shadow: 0 0 4px #00f0ff;
+}
+.glow:hover {
+  box-shadow: 0 0 12px #00f0ff;
+}
+
+/* ======= Toasts ======= */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+/* ======= Fullscreen Loading Overlay ======= */
+#loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+/* Glowing Spinner */
+.spinner-cyber {
+  width: 60px;
+  height: 60px;
+  border: 6px solid transparent;
+  border-top: 6px solid #00f0ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite, glow-spin 2s ease-in-out infinite alternate;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+@keyframes glow-spin {
+  0% { box-shadow: 0 0 6px #00f0ff; }
+  100% { box-shadow: 0 0 20px #00f0ff; }
+}
+
+/* ======= Modal Animation ======= */
+.modal.fade .modal-dialog {
+  transform: translateY(-20%);
+  transition: all 0.4s ease-in-out;
+  opacity: 0;
+}
+.modal.show .modal-dialog {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ======= Dark Theme Form Controls ======= */
+input.form-control, select.form-control, textarea.form-control {
+  background-color: #0f1a1e;
+  border: 1px solid #00f0ff55;
+  color: #00f0ff;
+}
+input.form-control:focus, select.form-control:focus, textarea.form-control:focus {
+  background-color: #121e24;
+  border-color: #00f0ff;
+  box-shadow: 0 0 6px #00f0ff;
+  color: #ffffff;
+}
+
+/* ======= Alerts & Tooltips ======= */
+.alert {
+  background-color: #01161f;
+  color: #00f0ff;
+  border-left: 4px solid #00f0ff;
+  padding: 1rem;
+  animation: fadeSlideIn 0.5s ease;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tooltip-inner {
+  background-color: #002a3d;
+  color: #00f0ff;
+  border: 1px solid #00f0ff33;
+}
+.tooltip.bs-tooltip-top .arrow::before {
+  border-top-color: #00f0ff;
+}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Result | SecureFileX{% endblock %}
+
+{% block content %}
+<!-- External Styles -->
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<!-- Binary Rain Canvas -->
+<canvas id="binaryRain"></canvas>
+
+<!-- Main Result Content -->
+<div class="container main-content text-light" data-aos="fade-up">
+  <h2 class="fw-bold mb-4">📊 Operation Result</h2>
+  <p class="text-white-50 mb-4">Below are the details of your recent encryption or decryption task.</p>
+
+  {% if message %}
+    <div class="alert {% if '✅' in message %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+
+  {% if file_url %}
+    <div class="mb-4 text-center" data-aos="zoom-in">
+      <a href="{{ file_url }}" class="btn btn-outline-info btn-lg" target="_blank" rel="noopener noreferrer" download>
+        📥 Download {{ action|title }} File
+      </a>
+    </div>
+  {% endif %}
+
+  {% if extracted_text %}
+    <div class="mb-4" data-aos="fade-up">
+      <h5 class="text-info">📜 Extracted/Decrypted Text</h5>
+      <textarea class="form-control bg-dark text-light" rows="6" readonly>{{ extracted_text }}</textarea>
+    </div>
+  {% endif %}
+
+  {% if salt %}
+    <div class="alert alert-warning mt-4" role="region">
+      <strong>🧂 Salt Used:</strong>
+      <textarea class="form-control bg-dark text-warning mt-2" rows="2" readonly>{{ salt }}</textarea>
+    </div>
+  {% endif %}
+
+  {% if generated_key %}
+    <div class="alert alert-info mt-4" role="region">
+      <strong>🔑 Generated Key:</strong>
+      <textarea class="form-control bg-dark text-info mt-2" rows="3" readonly>{{ generated_key }}</textarea>
+    </div>
+  {% endif %}
+
+  {% if algorithm or action or timestamp %}
+    <div class="card bg-dark text-light border-info mt-4" data-aos="fade-up">
+      <div class="card-header bg-info">
+        🧠 Operation Details
+      </div>
+      <div class="card-body text-start">
+        {% if algorithm %}<p><strong>🔐 Algorithm:</strong> {{ algorithm }}</p>{% endif %}
+        {% if action %}<p><strong>📂 Action:</strong> {{ action|title }}</p>{% endif %}
+        {% if timestamp %}<p><strong>🕒 Time:</strong> {{ timestamp }}</p>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="back-btn mt-5 text-center" data-aos="fade-up">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+      🔙 Back to Home
+    </a>
+  </div>
+</div>
+
+<!-- Binary Rain Animation -->
+<script>
+  const canvas = document.getElementById("binaryRain");
+  const ctx = canvas.getContext("2d");
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  let fontSize = 16;
+  let columns = Math.floor(width / fontSize);
+  let drops = Array(columns).fill(1);
+  const binary = "01";
+
+  canvas.width = width;
+  canvas.height = height;
+
+  function drawRain() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#00ffee";
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = binary[Math.floor(Math.random() * binary.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+
+  let rainInterval = setInterval(drawRain, 40);
+
+  window.addEventListener("resize", () => {
+    clearInterval(rainInterval);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    columns = Math.floor(width / fontSize);
+    drops = Array(columns).fill(1);
+    rainInterval = setInterval(drawRain, 40);
+  });
+</script>
+
+<!-- AOS Animation -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 1000, once: true });
+</script>
+{% endblock %}

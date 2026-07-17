@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Encrypt | SecureFileX{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<canvas id="binaryRain" aria-hidden="true"></canvas>
+
+<div class="container py-5 main-content text-light animate__animated animate__fadeIn">
+  <h1 class="display-5 text-info fw-bold text-center mb-4">🔐 SecureFileX</h1>
+  <p class="lead text-center mb-5">Encrypt your files securely in 3 steps.</p>
+
+  <!-- STEP NAVIGATION -->
+  <ul class="nav nav-pills nav-justified mb-4">
+    <li class="nav-item"><a id="tab-step1" class="nav-link active">Step 1</a></li>
+    <li class="nav-item"><a id="tab-step2" class="nav-link disabled">Step 2</a></li>
+    <li class="nav-item"><a id="tab-step3" class="nav-link disabled">Step 3</a></li>
+  </ul>
+
+  <!-- Encrypt Form -->
+  <form id="encrypt-form" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 700px;">
+    {% csrf_token %}
+
+    <!-- STEP 1 -->
+    <div id="step1" class="glass-card p-4 mb-4">
+      <label for="file" class="form-label text-info">📁 Select a file to encrypt <span class="text-danger">*</span></label>
+      <input type="file" name="file" id="file" class="form-control bg-dark text-light" accept=".txt,.pdf,.png,.jpg,.jpeg,.docx,.zip,.json,.xml" required>
+      <div id="preview" class="mt-3 small text"></div>
+      <div class="text-end"><button type="button" class="btn btn-primary mt-3" id="nextToStep2">➡️ Next</button></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" class="glass-card p-4 mb-4 d-none">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label for="algorithm" class="form-label text-info">🔐 Algorithm <span class="text-danger">*</span></label>
+          <select class="form-select bg-dark text-light" name="algorithm" id="algorithm" required>
+            <option value="">-- Select --</option>
+            <option value="fernet" selected>Fernet (Recommended)</option>
+            <option value="chacha20">ChaCha20</option>
+            <option value="aes-gcm">AES-GCM</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="password" class="form-label text-info d-flex justify-content-between align-items-center">
+            🔑 Passphrase <span class="text-danger">*</span>
+            <button type="button" class="btn btn-outline-warning btn-sm" id="generateKeyBtn">🔁 Auto-Generate</button>
+          </label>
+          <input type="text" name="password" id="password" class="form-control bg-dark text-light" required placeholder="Enter passphrase">
+          <div id="keyHelp" class="form-text text-light">Use a strong passphrase.</div>
+        </div>
+      </div>
+
+      <div id="displayKeyContainer" class="alert alert-success mt-4 d-none">
+        <strong>🔑 Generated Key:</strong>
+        <div class="bg-dark text-success p-2 rounded mt-2" id="displayKey" style="word-break: break-word;"></div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary" id="backToStep1">⬅️ Back</button>
+        <button type="button" class="btn btn-primary" id="nextToStep3">➡️ Next</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="glass-card p-4 mb-4 d-none">
+      <p class="text-info">Click below to start encryption:</p>
+      <button type="submit" class="btn btn-success btn-lg w-100" id="encryptBtn">🔐 Encrypt</button>
+      <div class="progress mt-3"><div class="progress-bar bg-info" id="progress-bar" style="width: 0%">0%</div></div>
+      <div class="text-info mt-2" id="progress-text" aria-live="polite"></div>
+      <button type="button" class="btn btn-secondary mt-4" id="backToStep2">⬅️ Back</button>
+    </div>
+  </form>
+
+  <!-- ENCRYPTION RESULT -->
+  <div id="result" class="glass-card p-4 mt-5 d-none">
+    <h4 class="text-success text-center">✅ File Encrypted Successfully</h4>
+    <p class="text-center">Download your files:</p>
+    <div class="d-flex justify-content-center gap-3 mb-3">
+      <a id="downloadEnc" class="btn btn-outline-info" download>⬇️ Encrypted File</a>
+      <a id="downloadMetadata" class="btn btn-outline-secondary" download>📄 Metadata</a>
+    </div>
+    <div class="text-center">
+      <h6 class="text-info">🔗 Secure Link</h6>
+      <code id="shortlink" class="text-light small d-block mb-3"></code>
+      <button class="btn btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#qrToggle">📱 Show/Hide QR</button>
+      <div class="collapse mt-3" id="qrToggle">
+        <img id="qrImage" src="" alt="QR Code" class="img-fluid" style="max-height: 200px;">
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <button class="btn btn-outline-success" onclick="location.reload()">🔁 Encrypt Another File</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const showStep = step => {
+    ["step1", "step2", "step3"].forEach(id => document.getElementById(id).classList.add("d-none"));
+    document.getElementById("step" + step).classList.remove("d-none");
+    ["tab-step1", "tab-step2", "tab-step3"].forEach(tab => document.getElementById(tab).classList.remove("active"));
+    document.getElementById("tab-step" + step).classList.add("active");
+  };
+
+  document.getElementById("nextToStep2").onclick = () => showStep(2);
+  document.getElementById("backToStep1").onclick = () => showStep(1);
+  document.getElementById("nextToStep3").onclick = () => showStep(3);
+  document.getElementById("backToStep2").onclick = () => showStep(2);
+
+  document.getElementById("file").addEventListener("change", function () {
+    const file = this.files[0];
+    document.getElementById("preview").textContent = file ? `📁 ${file.name}` : "";
+  });
+
+  document.getElementById("algorithm").addEventListener("change", function () {
+    const isRSA = this.value === "rsa";
+    document.getElementById("password").disabled = isRSA;
+    document.getElementById("generateKeyBtn").disabled = isRSA;
+    document.getElementById("keyHelp").textContent = isRSA
+      ? "RSA generates key pair automatically. Key file will be provided."
+      : "Use a strong passphrase (16+ characters).";
+  });
+
+  document.getElementById("generateKeyBtn").addEventListener("click", () => {
+    const key = [...Array(32)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    document.getElementById("password").value = key;
+    document.getElementById("displayKey").textContent = key;
+    document.getElementById("displayKeyContainer").classList.remove("d-none");
+  });
+
+  document.getElementById("encrypt-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const btn = document.getElementById("encryptBtn");
+    btn.disabled = true;
+
+    document.getElementById("progress-bar").style.width = "25%";
+    document.getElementById("progress-text").textContent = "Encrypting...";
+
+    fetch("{% url 'encrypt' %}", {
+      method: "POST",
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.json())
+    .then(data => {
+      btn.disabled = false;
+      if (data.success) {
+        document.getElementById("progress-bar").style.width = "100%";
+        document.getElementById("progress-text").textContent = "✅ Done!";
+        document.getElementById("downloadEnc").href = data.download_url;
+        document.getElementById("downloadMetadata").href = data.metadata_url;
+        document.getElementById("shortlink").textContent = data.shortlink;
+        if (data.qr_code_url) document.getElementById("qrImage").src = data.qr_code_url;
+
+        // Auto download encrypted file and metadata
+        const autoDownload = url => {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = "";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+        autoDownload(data.download_url);
+        autoDownload(data.metadata_url);
+
+        // Show result, hide form
+        document.getElementById("result").classList.remove("d-none");
+        document.getElementById("encrypt-form").classList.add("d-none");
+      } else {
+        document.getElementById("progress-text").textContent = data.error || "Encryption failed.";
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      document.getElementById("progress-text").textContent = "⚠️ Error: " + err.message;
+    });
+  });
+
+  // Binary Rain
+  const canvas = document.getElementById('binaryRain');
+  const ctx = canvas.getContext('2d');
+  const fontSize = 14, chars = '01';
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const cols = Math.floor(canvas.width / fontSize);
+  const drops = Array(cols).fill(1);
+  setInterval(() => {
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
+    drops.forEach((y, i) => {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, y * fontSize);
+      drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+    });
+  }, 50);
+</script>
+
+<style>
+  #binaryRain {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: black;
+  }
+  .main-content {
+    position: relative;
+    z-index: 1;
+  }
+  .glass-card {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.08);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+</style>
+{% endblock %}

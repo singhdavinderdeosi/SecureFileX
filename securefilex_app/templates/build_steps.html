@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Build Process | SecureFileX{% endblock %}
+
+{% block content %}
+<div class="container py-5" data-bs-spy="scroll" data-bs-target="#scrollspyNav" data-bs-offset="100" tabindex="0">
+
+  <!-- 🧠 Header -->
+  <div class="text-center mb-5">
+    <h1 class="display-5 fw-bold text-info animate__animated animate__fadeInDown">🛠 SecureFileX Architecture Journey</h1>
+    <p class="lead text-white-50 animate__animated animate__fadeInUp">
+      Explore how we designed, secured, and brought AI intelligence to life in SecureFileX.
+    </p>
+  </div>
+
+  <!-- 🔍 Scrollspy Navbar -->
+  <nav id="scrollspyNav" class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top bg-dark rounded-pill px-3 py-2">
+    <ul class="navbar-nav nav-pills mx-auto">
+      <li class="nav-item"><a class="nav-link" href="#architecture">Architecture</a></li>
+      <li class="nav-item"><a class="nav-link" href="#encryption">Encryption</a></li>
+      <li class="nav-item"><a class="nav-link" href="#ai-logs">AI Logs</a></li>
+      <li class="nav-item"><a class="nav-link" href="#frontend">UI/UX</a></li>
+      <li class="nav-item"><a class="nav-link" href="#security">Security</a></li>
+      <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+      <li class="nav-item"><a class="nav-link" href="#v1-4">v1.4</a></li>
+    </ul>
+  </nav>
+
+  <!-- TIMELINE -->
+  <div class="timeline position-relative">
+
+    <!-- ARCHITECTURE -->
+    <div id="architecture" class="timeline-item d-flex flex-row align-items-center mb-5">
+      <div class="timeline-icon bg-info text-white shadow"><i class="fa-solid fa-network-wired"></i></div>
+      <div class="timeline-card glass border-start border-info shadow-lg">
+        <h5 class="text-info fw-bold mb-1">Project Architecture</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>📦 Models: JSON key store structure</li>
+          <li>⚙️ Views: Encryption, AI logs, salt/key generation</li>
+          <li>🎨 Templates: Bootstrap 5 + Glass UI</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ENCRYPTION -->
+    <div id="encryption" class="timeline-item d-flex flex-row-reverse align-items-center mb-5">
+      <div class="timeline-icon bg-warning text-dark shadow"><i class="fa-solid fa-lock"></i></div>
+      <div class="timeline-card glass border-start border-warning shadow-lg">
+        <h5 class="text-warning fw-bold mb-1">Encryption Engines</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>🔐 Fernet AES + passphrase (PBKDF2)</li>
+          <li>🔐 AES-GCM (PyCryptodome)</li>
+          <li>🔐 ChaCha20 Stream Cipher</li>
+          <li>🔐 RSA-2048 Keypair Asymmetric</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- AI LOGGING -->
+    <div id="ai-logs" class="timeline-item d-flex flex-row align-items-center mb-5">
+      <div class="timeline-icon bg-success text-white shadow"><i class="fa-solid fa-brain"></i></div>
+      <div class="timeline-card glass border-start border-success shadow-lg">
+        <h5 class="text-success fw-bold mb-1">GPT-4o AI Logging</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>🧠 GPT Summarization of `securefilex.log`</li>
+          <li>📊 Matplotlib Insights</li>
+          <li>📥 Exportable AI Log Reports</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FRONTEND -->
+    <div id="frontend" class="timeline-item d-flex flex-row-reverse align-items-center mb-5">
+      <div class="timeline-icon bg-primary text-white shadow"><i class="fa-solid fa-display"></i></div>
+      <div class="timeline-card glass border-start border-primary shadow-lg">
+        <h5 class="text-primary fw-bold mb-1">Frontend & UX</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>💠 Glass UI using backdrop blur</li>
+          <li>📱 Fully responsive on all devices</li>
+          <li>🌀 Animate.css + tooltips</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="security" class="timeline-item d-flex flex-row align-items-center mb-5">
+      <div class="timeline-icon bg-danger text-white shadow"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="timeline-card glass border-start border-danger shadow-lg">
+        <h5 class="text-danger fw-bold mb-1">Security Principles</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>🔐 Offline-first encryption</li>
+          <li>🔍 Client-held keys, no server logs</li>
+          <li>🚫 No cloud dependence</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div id="team" class="timeline-item d-flex flex-row-reverse align-items-center mb-5">
+      <div class="timeline-icon bg-info text-white shadow"><i class="fa-solid fa-users"></i></div>
+      <div class="timeline-card glass border-start border-info shadow-lg">
+        <h5 class="text-info fw-bold mb-1">Development Team</h5>
+        <ul class="text-white-50 small mb-0">
+          <li>👨‍💻 Davinder Singh – 2291013</li>
+          <li>👨‍💻 Shikhil Paul – 2291056</li>
+          <li>👩‍💻 Minaz – 2291043</li>
+          <li>🤖 GPT-4o Integration</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- VERSION HISTORY -->
+    <div id="v1-4" class="timeline-item d-flex flex-row align-items-center mb-5">
+      <div class="timeline-icon bg-warning text-dark shadow"><i class="fa-solid fa-bolt"></i></div>
+      <div class="timeline-card glass border-start border-warning shadow-lg">
+        <h5 class="text-warning fw-bold mb-1">What’s New in v1.4</h5>
+        <ul class="text-white-50 small mb-2">
+          <li>📄 PDF Log Export</li>
+          <li>📊 GPT Chart Summaries</li>
+          <li>📁 Drag & Drop + AI Salt</li>
+          <li>🚀 Key Tracking System</li>
+        </ul>
+        <button class="btn btn-sm btn-outline-light mt-2" onclick="toggleChangelog()">🕰 Show Older Versions</button>
+        <div id="older-versions" class="mt-2 d-none text-white-50 small">
+          <strong>v1.3:</strong> Vault Dashboard + Anomaly Logs<br>
+          <strong>v1.2:</strong> SHA256 File Checksum<br>
+          <strong>v1.1:</strong> AI Logs + Activity Timeline<br>
+          <strong>v1.0:</strong> Core Encryption & Stego
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <div class="text-center mt-5">
+    <a href="{% url 'about' %}" class="btn btn-outline-info px-5 glow">
+      <i class="fa-solid fa-arrow-left"></i> Back to About
+    </a>
+  </div>
+</div>
+
+<!-- 🎨 CSS -->
+<style>
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: rgba(0, 255, 255, 0.1);
+    z-index: 0;
+    transform: translateX(-50%);
+  }
+
+  .timeline-item {
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 20px;
+    animation: pulse-shadow 2s infinite;
+  }
+
+  .timeline-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    max-width: 500px;
+    backdrop-filter: blur(14px);
+    background-color: rgba(0, 0, 0, 0.55);
+  }
+
+  @keyframes pulse-shadow {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.3); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+  }
+
+  @media (max-width: 768px) {
+    .timeline::before { left: 10px; }
+    .timeline-item { flex-direction: column !important; }
+    .timeline-icon { margin: 10px 0; }
+  }
+</style>
+
+<!-- 🧠 Script -->
+<script>
+  function toggleChangelog() {
+    document.getElementById("older-versions").classList.toggle("d-none");
+  }
+</script>
+{% endblock %}

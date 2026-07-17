@@ -1,0 +1,145 @@
+/* 🌌 Background & Typography */
+body {
+  background: linear-gradient(145deg, #0a0f1a, #1b2235);
+  color: #d6e2f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 🧠 Header Enhancements */
+header h1 {
+  font-size: 2.8rem;
+  text-shadow: 0 0 10px #00ffff;
+}
+header p.lead {
+  color: #cccccc;
+  font-size: 1.2rem;
+}
+
+/* 🃏 Flip Cards Customization */
+.flip-card {
+  transition: transform 0.4s ease;
+  border-radius: 1rem;
+}
+.flip-card:hover {
+  transform: scale(1.05);
+}
+.flip-front, .flip-back {
+  font-size: 0.95rem;
+  padding: 1.2rem;
+  border-radius: 1rem;
+}
+.flip-front h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+
+/* 🌈 Neon Border Glow Effects */
+.neon-border-warning:hover { box-shadow: 0 0 15px yellow; }
+.neon-border-success:hover { box-shadow: 0 0 15px #00ff99; }
+.neon-border-primary:hover { box-shadow: 0 0 15px #3399ff; }
+.neon-border-info:hover    { box-shadow: 0 0 15px #00f0ff; }
+.neon-border-danger:hover  { box-shadow: 0 0 15px #ff3333; }
+.neon-border-light:hover   { box-shadow: 0 0 15px #ffffff; }
+
+/* ✨ Glass Card Background */
+.glass-card {
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+/* ⚛️ React Section Styling */
+#about-react-root {
+  margin-top: 3rem;
+}
+#about-react-root .alert {
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 10px;
+  background-color: rgba(0, 255, 255, 0.1);
+  border: 1px solid #00ffff;
+}
+
+/* 🔙 Back to Dashboard Button */
+.btn.glow {
+  transition: 0.3s ease;
+}
+.btn.glow:hover {
+  box-shadow: 0 0 20px #00f0ff, 0 0 30px #00f0ff;
+  transform: scale(1.05);
+}
+
+/* 🧩 Section Headings */
+.card h2,
+section h2 {
+  color: #00f0ff;
+  text-shadow: 0 0 5px #00f0ff;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* 💡 Tooltip Styling */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 125%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 255, 255, 0.85);
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  z-index: 10;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 992px) {
+  .flip-front, .flip-back {
+    font-size: 0.85rem;
+    padding: 1rem;
+  }
+}
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2.2rem;
+  }
+  .flip-card {
+    height: auto;
+  }
+  .card h2, section h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* 🪄 Animations */
+.glow-on-load {
+  animation: glowPulse 1.5s ease-in-out infinite alternate;
+}
+@keyframes glowPulse {
+  from {
+    box-shadow: 0 0 10px #00f0ff;
+  }
+  to {
+    box-shadow: 0 0 20px #00f0ff;
+  }
+}
+
+/* 🔧 Misc */
+.card-face.bg-black {
+  background-color: #000 !important;
+}
+a.text-decoration-none:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account | SecureFileX{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- 👤 Header -->
+  <div class="text-center mb-5">
+    <h2 class="display-5 fw-bold text-info animate__animated animate__fadeInDown">
+      <i class="fa-solid fa-user-shield me-2"></i> My Account
+    </h2>
+    <p class="lead text-white-50 animate__animated animate__fadeInUp">
+      View your profile details. To make changes, visit <strong>Settings</strong>.
+    </p>
+  </div>
+
+  <div class="row gy-5 justify-content-center">
+
+    <!-- 🖼 Avatar -->
+    <div class="col-lg-5">
+      <div class="card bg-dark text-white border border-info shadow-lg rounded-4 p-4 neon-glow animate__animated animate__fadeInLeft text-center">
+        <h4 class="text-info mb-3"><i class="fa-solid fa-user-circle me-2"></i> Profile Avatar</h4>
+        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}"
+             onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed={{ user.username }}';"
+             class="rounded-circle shadow border border-info avatar-img" alt="Avatar">
+        <div class="mt-3">
+          <a href="{% url 'settings' %}" class="btn btn-outline-info btn-sm rounded-pill px-4 mt-2">
+            <i class="fa-solid fa-sliders me-2"></i>Manage in Settings
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📋 Info -->
+    <div class="col-lg-5">
+      <div class="card bg-dark text-white border border-success shadow-lg rounded-4 p-4 animate__animated animate__fadeInRight">
+        <h4 class="text-success"><i class="fa-solid fa-address-card me-2"></i> Profile Info</h4>
+        <hr class="border-success">
+        <ul class="list-group list-group-flush mt-2">
+          <li class="list-group-item bg-transparent text-light"><strong>Username:</strong> <span class="float-end text-info">{{ user.username }}</span></li>
+          <li class="list-group-item bg-transparent text-light"><strong>Email:</strong> <span class="float-end text-info">{{ user.email|default:"Not provided" }}</span></li>
+          <li class="list-group-item bg-transparent text-light"><strong>Joined:</strong> <span class="float-end">{{ user.date_joined|date:"F j, Y" }}</span></li>
+          <li class="list-group-item bg-transparent text-light"><strong>Last Login:</strong> <span class="float-end">{{ user.last_login|date:"F j, Y, g:i A" }}</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 🔐 Security Info -->
+    <div class="col-lg-10">
+      <div class="card bg-dark text-light border border-warning shadow-lg rounded-4 p-4 animate__animated animate__fadeInUp">
+        <h4 class="text-warning"><i class="fa-solid fa-lock me-2"></i> Security Settings</h4>
+        <hr class="border-warning">
+        <p class="mb-2">Password, multi-factor authentication, and other settings are available in the settings panel.</p>
+        <a href="{% url 'settings' %}" class="btn btn-outline-warning btn-sm rounded-pill px-4">
+          <i class="fa-solid fa-gear me-2"></i>Go to Settings
+        </a>
+      </div>
+    </div>
+
+    <!-- 🧠 Recent Activity -->
+    <div class="col-lg-10">
+      <div class="card bg-dark text-light border border-primary shadow-lg rounded-4 p-4 animate__animated animate__fadeInUp">
+        <h4 class="text-primary"><i class="fa-solid fa-list-check me-2"></i> Recent Activity</h4>
+        <hr class="border-primary">
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-start">
+            <span><i class="fa-solid fa-lock text-info me-2"></i>Encrypted <strong>secure_notes.txt</strong></span>
+            <span class="text-white-50">{{ user.last_login|timesince }} ago</span>
+          </li>
+          <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-start">
+            <span><i class="fa-solid fa-download text-warning me-2"></i>Downloaded <strong>report_2025.zip</strong></span>
+            <span class="text-white-50">1 hour ago</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 🔙 Return -->
+  <div class="text-center mt-5">
+    <a href="{% url 'home' %}" class="btn btn-outline-light btn-lg px-4 shadow">
+      <i class="fa-solid fa-arrow-left me-2"></i>Return to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- 🎨 Styles -->
+<style>
+  .avatar-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: 0.3s ease-in-out;
+  }
+
+  .avatar-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #00f7ff;
+  }
+
+  .list-group-item {
+    font-size: 0.95rem;
+    border: none;
+  }
+
+  .neon-glow:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease-in-out;
+  }
+</style>
+{% endblock %}

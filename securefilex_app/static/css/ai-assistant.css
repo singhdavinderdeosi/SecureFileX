@@ -1,0 +1,62 @@
+#ai-widget {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 320px;
+    height: 420px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  
+  #ai-header {
+    background-color: #00f0ff;
+    color: #000;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  #ai-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+    color: #eee;
+  }
+  
+  .ai-msg {
+    margin-bottom: 10px;
+  }
+  
+  #ai-input-bar {
+    display: flex;
+    border-top: 1px solid #00f0ff33;
+  }
+  
+  #ai-input {
+    flex: 1;
+    padding: 8px;
+    background: #101010;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+  }
+  
+  #ai-input:focus {
+    outline: none;
+    background: #181818;
+  }
+  
+  #ai-send-btn {
+    background: #00f0ff;
+    color: #000;
+    border: none;
+    padding: 0 16px;
+    font-weight: bold;
+  }
+  

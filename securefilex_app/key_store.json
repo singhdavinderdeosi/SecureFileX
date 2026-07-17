@@ -1,0 +1,9 @@
+[
+    {
+        "filename": "encrypted_banner.png",
+        "algorithm": "Fernet (AES)",
+        "key": "3wwdnhm1usUEf6McE42H91HgHnOrcQ5EOhOoTrHWZ18=",
+        "salt": "",
+        "extra": null
+    }
+]

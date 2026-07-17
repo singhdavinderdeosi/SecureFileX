@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Verify PIN | SecureFileX{% endblock %}
+
+{% block content %}
+<style>
+  .verify-container {
+    max-width: 400px;
+    margin: 4rem auto;
+    background-color: #111d2f;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 225, 0.2);
+  }
+  .form-label {
+    color: #00ffe1;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  .form-control {
+    background: #1c1f25;
+    border: 1px solid #00ffe1;
+    color: #dcdcdc;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    width: 100%;
+    transition: border-color 0.3s ease;
+  }
+  .form-control:focus {
+    border-color: #00ffae;
+    outline: none;
+    box-shadow: 0 0 8px #00ffae;
+  }
+  .btn-share {
+    background: linear-gradient(to right, #00ffe1, #00ffae);
+    border: none;
+    color: #000;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.25rem;
+    border-radius: 50px;
+    width: 100%;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+  .btn-share:hover,
+  .btn-share:focus {
+    background: linear-gradient(to left, #00ffe1, #00ffae);
+    box-shadow: 0 0 20px #00ffe1;
+    transform: scale(1.05);
+    outline: none;
+  }
+</style>
+
+<div class="container verify-container text-center" role="main" aria-labelledby="verifyPinHeading">
+  <h1 id="verifyPinHeading" class="text-info mb-4">🔐 Verify Your File Access</h1>
+  <form method="POST" action="{% url 'verify' filename=filename pin=pin %}" aria-describedby="pinInstructions">
+    {% csrf_token %}
+    <div class="form-group text-start">
+      <label for="pinInput" class="form-label">Enter PIN</label>
+      <input
+        type="text"
+        name="pin"
+        id="pinInput"
+        class="form-control"
+        required
+        pattern="\d{4,8}"
+        maxlength="8"
+        minlength="4"
+        inputmode="numeric"
+        aria-required="true"
+        aria-describedby="pinInstructions"
+        autocomplete="one-time-code"
+        placeholder="Enter your 4-8 digit PIN"
+      >
+      <small id="pinInstructions" class="text-light d-block mt-1">Please enter the PIN provided with your file.</small>
+    </div>
+    <button type="submit" class="btn btn-share" aria-label="Verify PIN and access file">Verify</button>
+  </form>
+</div>
+{% endblock %}
